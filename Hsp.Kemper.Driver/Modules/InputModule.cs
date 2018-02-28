@@ -14,7 +14,7 @@
     public int InoutDistortionSense { get; set; }
 
 
-    public InputModule(KemperDriver owner) : base(owner, 0x09)
+    public InputModule() : base(9)
     {
     }
 

@@ -14,7 +14,7 @@
     public bool RigTempoEnabled { get; set; }
 
 
-    internal RigModule(KemperDriver owner) : base(owner, 0x04)
+    internal RigModule() : base(4)
     {
     }
 

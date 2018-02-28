@@ -14,14 +14,11 @@ namespace Hsp.Kemper.Driver
   public abstract class Module
   {
 
-    public KemperDriver Owner { get; }
-
     public byte NrpnPageNo { get; }
 
 
-    protected Module(KemperDriver owner, byte nrpnPageNo)
+    protected Module(byte nrpnPageNo)
     {
-      Owner = owner;
       NrpnPageNo = nrpnPageNo;
     }
 

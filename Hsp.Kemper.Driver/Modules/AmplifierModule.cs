@@ -35,7 +35,7 @@
     public double DirectMix { get; set; }
 
 
-    public AmplifierModule(KemperDriver owner) : base(owner, 10)
+    public AmplifierModule() : base(10)
     {
     }
 

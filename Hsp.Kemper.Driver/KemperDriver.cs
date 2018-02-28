@@ -25,9 +25,9 @@ namespace Hsp.Kemper.Driver
     {
       Device = device;
 
-      Rig = new RigModule(this);
-      Input = new InputModule(this);
-      Amplifier = new AmplifierModule(this);
+      Rig = new RigModule();
+      Input = new InputModule();
+      Amplifier = new AmplifierModule();
     }
 
 

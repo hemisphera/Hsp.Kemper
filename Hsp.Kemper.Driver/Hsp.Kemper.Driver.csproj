@@ -50,6 +50,7 @@
     <Compile Include="Messages\WriteValueMessage.cs" />
     <Compile Include="Messages\SysExMessage.cs" />
     <Compile Include="Modules\AmplifierModule.cs" />
+    <Compile Include="Modules\EqualizerModule.cs" />
     <Compile Include="Modules\InputModule.cs" />
     <Compile Include="Messages\ReadValueMessage.cs" />
     <Compile Include="Modules\RigModule.cs" />

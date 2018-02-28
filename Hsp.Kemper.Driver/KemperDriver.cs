@@ -20,6 +20,8 @@ namespace Hsp.Kemper.Driver
     
     public AmplifierModule Amplifier { get; }
 
+    public EqualizerModule Equalizer { get; }
+
 
     public KemperDriver(IMidiSysExDevice device)
     {
@@ -28,6 +30,7 @@ namespace Hsp.Kemper.Driver
       Rig = new RigModule();
       Input = new InputModule();
       Amplifier = new AmplifierModule();
+      Equalizer = new EqualizerModule();
     }
 
 

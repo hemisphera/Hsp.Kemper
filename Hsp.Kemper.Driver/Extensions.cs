@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,16 +19,18 @@ namespace Hsp.Kemper.Driver
       return result;
     }
 
-    public static byte[] To14BitArray(this int value)
+    internal static byte[] To14BitArray(this int value)
     {
       var b1 = (byte)((value >> 7) & 0x7f);
       var b2 = (byte)(value & 0x7f);
       return new[] {b1, b2};
     }
 
-    public static int From14BitArray(this byte[] value)
+    internal static int ToInt(this byte[] value)
     {
-      return value[10] << 7 | value[11];
+      if (value.Length != 2)
+        throw new NotSupportedException($"The length of {nameof(value)} must be 2.");
+      return value[0] << 7 | value[1];
     }
 
   }

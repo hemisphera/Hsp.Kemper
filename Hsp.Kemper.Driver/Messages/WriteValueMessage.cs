@@ -10,7 +10,7 @@ namespace Hsp.Kemper.Driver
     {
       var page = dataBlock[8];
       var address = dataBlock[9];
-      var value = dataBlock.Skip(9).Take(2).ToArray().From14BitArray();
+      var value = dataBlock.Skip(9).Take(2).ToArray().ToInt();
       return new WriteValueMessage(page, address, value);
     }
 

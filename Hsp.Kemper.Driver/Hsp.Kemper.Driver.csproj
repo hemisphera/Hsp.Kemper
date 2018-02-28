@@ -45,7 +45,9 @@
     <Compile Include="KemperDriver.cs" />
     <Compile Include="KemperFunctions.cs" />
     <Compile Include="Messages\NrpnSysExMessage.cs" />
+    <Compile Include="Messages\ReadMultiValueMessage.cs" />
     <Compile Include="Messages\ReadStringValueMessage.cs" />
+    <Compile Include="Messages\WriteMultiValueMessage.cs" />
     <Compile Include="Messages\WriteStringValueMessage.cs" />
     <Compile Include="Messages\WriteValueMessage.cs" />
     <Compile Include="Messages\SysExMessage.cs" />

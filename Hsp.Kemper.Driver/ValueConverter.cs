@@ -11,7 +11,7 @@ namespace Hsp.Kemper.Driver
   internal static class ValueConverter
   {
     /// <summary>
-    /// Converts a property value to a byte array for use in SysExMessage
+    /// Converts a property value to a value for use in SysExMessage
     /// </summary>
     /// <param name="property"></param>
     /// <param name="value"></param>

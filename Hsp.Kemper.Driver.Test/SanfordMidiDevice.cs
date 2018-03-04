@@ -10,7 +10,7 @@ using Sanford.Multimedia.Midi;
 namespace Hsp.Kemper.Driver.Test
 {
 
-  public class SanfordMidiDevice : IMidiSysExDevice, IDisposable
+  public class SanfordMidiDevice : IMidiDevice, IDisposable
   {
 
     private Queue<SysExMessage> MessageQueue { get; }
@@ -25,8 +25,10 @@ namespace Hsp.Kemper.Driver.Test
       MessageQueue = new Queue<SysExMessage>();
       
       OutputMidiDevice = od;
+      var outputDeviceName = OutputDevice.GetDeviceCapabilities(od.DeviceID).name;
 
       InputMidiDevice = id;
+      var inputDeviceName = InputDevice.GetDeviceCapabilities(id.DeviceID).name;
       InputMidiDevice.StartRecording();
       InputMidiDevice.SysExMessageReceived += (s, e) => HandleMidiInMessage(e.Message);
     }
@@ -35,8 +37,9 @@ namespace Hsp.Kemper.Driver.Test
     {
       var data = msg.GetBytes();
       var kmsg = SysExMessage.Parse(data);
-      lock (MessageQueue)
-        MessageQueue.Enqueue(kmsg);
+      if (kmsg != null)
+        lock (MessageQueue)
+          MessageQueue.Enqueue(kmsg);
     }
 
 
@@ -62,7 +65,7 @@ namespace Hsp.Kemper.Driver.Test
       OutputMidiDevice.Send(sem);
     }
 
-    public void WaitForResult()
+    public void WaitForSysExMessage(TimeSpan timout)
     {
       var m = new ManualResetEvent(false);
       Task.Run(() =>
@@ -77,9 +80,15 @@ namespace Hsp.Kemper.Driver.Test
         }
         m.Set();
       });
-      m.WaitOne();
+      m.WaitOne(timout);
     }
-    
+
+    public void SendControlChange(byte channel, byte controller, byte value)
+    {
+      var msg = new ChannelMessage(ChannelCommand.Controller, channel, controller, value);
+      OutputMidiDevice.Send(msg);
+    }
+
     public void Dispose()
     {
       InputMidiDevice.StopRecording();

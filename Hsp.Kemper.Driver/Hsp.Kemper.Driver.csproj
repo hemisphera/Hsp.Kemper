@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
-    <Compile Include="IMidiSysExDevice.cs" />
+    <Compile Include="IMidiDevice.cs" />
     <Compile Include="KemperDriver.cs" />
     <Compile Include="KemperFunctions.cs" />
     <Compile Include="Messages\NrpnSysExMessage.cs" />

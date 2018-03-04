@@ -1,9 +1,4 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hsp.Kemper.Driver
 {
@@ -11,10 +6,10 @@ namespace Hsp.Kemper.Driver
   public static class Extensions
   {
 
-    public static SysExMessage SendWithResult(this IMidiSysExDevice ifc, SysExMessage msg)
+    public static SysExMessage SendWithResult(this IMidiDevice ifc, SysExMessage msg, TimeSpan timeout)
     {
       ifc.SendSysExMessage(msg);
-      ifc.WaitForResult();
+      ifc.WaitForSysExMessage(timeout);
       var result = ifc.ReadSysExMessage();
       return result;
     }

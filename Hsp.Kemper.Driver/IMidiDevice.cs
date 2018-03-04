@@ -3,7 +3,7 @@
 namespace Hsp.Kemper.Driver
 {
 
-  public interface IMidiSysExDevice
+  public interface IMidiDevice
   {
 
     /// <summary>
@@ -21,7 +21,15 @@ namespace Hsp.Kemper.Driver
     /// <summary>
     /// Wait until the next SysEx message is available on the device.
     /// </summary>
-    void WaitForResult();
+    void WaitForSysExMessage(TimeSpan timeout);
+
+    /// <summary>
+    /// Send a control-change message
+    /// </summary>
+    /// <param name="channel"></param>
+    /// <param name="controller"></param>
+    /// <param name="value"></param>
+    void SendControlChange(byte channel, byte controller, byte value);
 
   }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Configuration;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +12,9 @@ namespace Hsp.Kemper.Driver
   public class KemperDriver : IDisposable
   {
 
-    public IMidiSysExDevice Device { get; }
+    public IMidiDevice Device { get; }
 
+    public TimeSpan MidiTimeout { get; set; }
     
     public RigModule Rig { get; }
 
@@ -24,12 +26,17 @@ namespace Hsp.Kemper.Driver
     
     public CabinetModule Cabinet { get; }
 
+    public RigMetadataModule RigMetadata { get; }
 
-    public KemperDriver(IMidiSysExDevice device)
+
+    public KemperDriver(IMidiDevice device)
     {
       Device = device;
 
+      MidiTimeout = TimeSpan.FromMilliseconds(1500);
+
       Rig = new RigModule();
+      RigMetadata = new RigMetadataModule();
       Input = new InputModule();
       Amplifier = new AmplifierModule();
       Equalizer = new EqualizerModule();
@@ -87,7 +94,7 @@ namespace Hsp.Kemper.Driver
       foreach (var parameterValue in parameters)
       {
         var msg = NrpnSysExMessage.CreateReadMessage(parameterValue);
-        var result = Device.SendWithResult(msg);
+        var result = Device.SendWithResult(msg, MidiTimeout);
 
         object value = null;
         if (result is WriteValueMessage writeValueMsg)

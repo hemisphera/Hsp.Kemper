@@ -4,13 +4,13 @@
   public class RigModule : Module
   {
 
-    [NrpnParameter(0x00, MinValue = 0.0, MaxValue = 256.0)]
+    [NrpnParameter(0, MinValue = 0.0, MaxValue = 256.0)]
     public double RigTempo { get; set; }
 
-    [NrpnParameter(0x01)]
+    [NrpnParameter(1)]
     public int RigVolume { get; set; }
 
-    [NrpnParameter(0x02)]
+    [NrpnParameter(2)]
     public bool RigTempoEnabled { get; set; }
 
 

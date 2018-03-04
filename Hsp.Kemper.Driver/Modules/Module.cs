@@ -25,9 +25,14 @@ namespace Hsp.Kemper.Driver
 
     public void SetValueFromParameter(ParameterProperty pv, object value)
     {
-      var targetParameter = GetParameterProperties()
-        .FirstOrDefault(p => p.Page == pv.Page &&
-                             p.Address == pv.Address);
+      var stringParameter = pv.Property.PropertyType == typeof(string);
+      var validParameters = GetParameterProperties()
+        .Where(p => p.Page == pv.Page &&
+                    p.Address == pv.Address);
+      if (stringParameter)
+        validParameters = validParameters.Where(p => p.Property.PropertyType == typeof(string));
+      var targetParameter = validParameters.LastOrDefault();
+
       if (targetParameter == null)
         throw new Exception(""); // todo: implement specific exception
 

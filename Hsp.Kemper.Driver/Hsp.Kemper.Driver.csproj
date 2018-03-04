@@ -56,6 +56,7 @@
     <Compile Include="Modules\EqualizerModule.cs" />
     <Compile Include="Modules\InputModule.cs" />
     <Compile Include="Messages\ReadValueMessage.cs" />
+    <Compile Include="Modules\RigMetadataModule.cs" />
     <Compile Include="Modules\RigModule.cs" />
     <Compile Include="NrpnParameterAttribute.cs" />
     <Compile Include="ParameterProperty.cs" />

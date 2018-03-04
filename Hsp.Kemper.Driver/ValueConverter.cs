@@ -41,6 +41,9 @@ namespace Hsp.Kemper.Driver
       if (property.PropertyType == typeof(bool))
         return (int)value > 0;
 
+      if (property.PropertyType == typeof(int))
+        return (int) value;
+
       if (property.PropertyType == typeof(double))
       {
         var intValue = (int) value;

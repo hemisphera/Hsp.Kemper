@@ -15,18 +15,8 @@ namespace Hsp.Kemper.Driver
     public IMidiDevice Device { get; }
 
     public TimeSpan MidiTimeout { get; set; }
-    
-    public RigModule Rig { get; }
 
-    public InputModule Input { get; }
-    
-    public AmplifierModule Amplifier { get; }
-
-    public EqualizerModule Equalizer { get; }
-    
-    public CabinetModule Cabinet { get; }
-
-    public RigMetadataModule RigMetadata { get; }
+    public KemperRig CurrentRig { get; private set; }
 
 
     public KemperDriver(IMidiDevice device)
@@ -35,52 +25,38 @@ namespace Hsp.Kemper.Driver
 
       MidiTimeout = TimeSpan.FromMilliseconds(1500);
 
-      Rig = new RigModule();
-      RigMetadata = new RigMetadataModule();
-      Input = new InputModule();
-      Amplifier = new AmplifierModule();
-      Equalizer = new EqualizerModule();
-      Cabinet = new CabinetModule();
+      CurrentRig = new KemperRig();
     }
 
-
-    private IEnumerable<PropertyInfo> GetModuleProperties()
-    {
-      var props = GetType().GetProperties().Where(p => p.PropertyType.IsSubclassOf(typeof(Module)));
-      return props;
-    }
-
-
-    public void Dispose()
-    {
-      if (Device is IDisposable disp)
-        disp.Dispose();
-    }
 
     public void WriteToDevice()
     {
-      var props = GetModuleProperties();
+      if (CurrentRig == null)
+        throw new ArgumentNullException(nameof(CurrentRig));
+      var props = CurrentRig.GetModuleProperties();
       foreach (var prop in props)
       {
-        var module = (Module) prop.GetValue(this);
+        var module = (Module) prop.GetValue(CurrentRig);
         WriteToDevice(module);
       }
     }
 
     public void WriteToDevice(Module module)
     {
-      var parameters = module.GetParameterProperties();
-      foreach (var parameterValue in parameters)
+      var properties = module.GetParameterProperties(true);
+      foreach (var property in properties)
       {
-        var value = parameterValue.Property.GetValue(this);
-        var msg = NrpnSysExMessage.CreateWriteMessage(parameterValue, value);
+        var value = property.GetValue(this);
+        var msg = NrpnSysExMessage.CreateWriteMessage(module, property, value);
         Device.SendSysExMessage(msg);
       }
     }
 
     public void ReadFromDevice()
     {
-      var props = GetModuleProperties();
+      CurrentRig = new KemperRig();
+
+      var props = CurrentRig.GetModuleProperties();
       foreach (var prop in props)
       {
         var module = (Module) prop.GetValue(this);
@@ -90,23 +66,21 @@ namespace Hsp.Kemper.Driver
 
     public void ReadFromDevice(Module module)
     {
-      var parameters = module.GetParameterProperties();
-      foreach (var parameterValue in parameters)
+      var properties = module.GetParameterProperties(false);
+      foreach (var property in properties)
       {
-        var msg = NrpnSysExMessage.CreateReadMessage(parameterValue);
-        var result = Device.SendWithResult(msg, MidiTimeout);
-
-        object value = null;
-        if (result is WriteValueMessage writeValueMsg)
-          value = writeValueMsg.Value;
-        if (result is WriteStringValueMessage writeStringValueMsg)
-          value = writeStringValueMsg.Value;
-        
-        if (value == null)
-          throw new Exception(""); // todo: implement specific exception
-        
-        module.SetValueFromParameter(parameterValue, value);
+        var outMsg = NrpnSysExMessage.CreateReadMessage(module, property);
+        var result = Device.SendWithResult(outMsg, MidiTimeout);
+        if (result is NrpnSysExMessage inMsg)
+          module.SetValueFromSysExMessage(inMsg);
       }
+    }
+
+
+    public void Dispose()
+    {
+      if (Device is IDisposable disp)
+        disp.Dispose();
     }
 
   }

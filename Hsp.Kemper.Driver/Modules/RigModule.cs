@@ -1,4 +1,6 @@
-﻿namespace Hsp.Kemper.Driver
+﻿using System;
+
+namespace Hsp.Kemper.Driver
 {
 
   public class RigModule : Module

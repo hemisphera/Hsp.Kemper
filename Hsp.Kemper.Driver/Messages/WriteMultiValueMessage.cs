@@ -2,27 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Hsp.Kemper.Driver.Converters;
 
 namespace Hsp.Kemper.Driver
 {
 
   public class WriteMultiValueMessage : NrpnSysExMessage
   {
-
+    
     public static WriteMultiValueMessage FromModule(Module module)
     {
-      var props = module.GetParameterProperties()
-        .Where(p => p.Property.PropertyType != typeof(string))
-        .OrderBy(p => p.Address)
-        .ToArray();
+      var props = module.GetParameterProperties(false)
+        .ToDictionary(
+          p => p.GetNrpnAddress(module),
+          p => p);
+
       if (!props.Any())
         throw new Exception(""); // todo: implement specific exception
 
-      var firstProp = props[0];
-      var msg = new WriteMultiValueMessage(firstProp.Page, firstProp.Address);
-
-      foreach (var prop in props)
-        msg.Values.Add((int) ValueConverter.ConvertFromProperty(prop.Property, prop.Property.GetValue(module)));
+      WriteMultiValueMessage msg = null;
+      foreach (var kvp in props)
+      {
+        var prop = kvp.Value;
+        var address = kvp.Key;
+        if (msg == null)
+          msg = new WriteMultiValueMessage(address.Page, address.Address);
+        else
+          msg.Values.Add((int) ConverterCache.Instance.ConvertToMidi(prop, prop.GetValue(module)));
+      }
 
       return msg;
     }
@@ -36,11 +43,11 @@ namespace Hsp.Kemper.Driver
     {
       var page = dataBlock[8];
       var address = dataBlock[9];
-      var values = dataBlock.Skip(9).ToArray();
+      var values = dataBlock.Skip(10).ToArray();
 
       var msg = new WriteMultiValueMessage(page, address);
 
-      while (values.Length > 0)
+      while (values.Length >= 2)
       {
         var ba = new[] {values[0], values[1]};
         msg.Values.Add(ba.ToInt());

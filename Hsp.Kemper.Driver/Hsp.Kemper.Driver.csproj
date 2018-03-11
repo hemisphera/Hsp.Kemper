@@ -40,10 +40,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\ConverterCache.cs" />
+    <Compile Include="Converters\IValueConverter.cs" />
+    <Compile Include="Converters\DateConverter.cs" />
+    <Compile Include="Converters\RatingConverter.cs" />
+    <Compile Include="Exceptions\PropertyNotFoundException.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IMidiDevice.cs" />
     <Compile Include="KemperDriver.cs" />
     <Compile Include="KemperFunctions.cs" />
+    <Compile Include="KemperRig.cs" />
     <Compile Include="Messages\NrpnSysExMessage.cs" />
     <Compile Include="Messages\ReadMultiValueMessage.cs" />
     <Compile Include="Messages\ReadStringValueMessage.cs" />
@@ -58,10 +64,16 @@
     <Compile Include="Messages\ReadValueMessage.cs" />
     <Compile Include="Modules\RigMetadataModule.cs" />
     <Compile Include="Modules\RigModule.cs" />
+    <Compile Include="NrpnAddress.cs" />
     <Compile Include="NrpnParameterAttribute.cs" />
-    <Compile Include="ParameterProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\Module.cs" />
+    <Compile Include="RigFile\KemperRigHeaderChunk.cs" />
+    <Compile Include="RigFile\KemperRigTrackChunk.cs" />
+    <Compile Include="RigFile\MidiChunk.cs" />
+    <Compile Include="RigFile\MidiChunkAttribute.cs" />
+    <Compile Include="RigFile\MidiFileHelper.cs" />
+    <Compile Include="RigFile\RigFile.cs" />
     <Compile Include="StompType.cs" />
     <Compile Include="ValueConverter.cs" />
   </ItemGroup>

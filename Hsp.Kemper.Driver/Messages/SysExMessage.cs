@@ -13,10 +13,15 @@ namespace Hsp.Kemper.Driver
     public static SysExMessage Parse(byte[] data)
     {
       var functioncode = data[6];
+      
       if (functioncode == KemperFunctions.WriteSingleParameter)
         return WriteValueMessage.FromInboundData(data);
+      
       if (functioncode == KemperFunctions.WriteStringParameter)
         return WriteStringValueMessage.FromInboundData(data);
+      
+      if (functioncode == KemperFunctions.WriteMultiParameter)
+        return WriteMultiValueMessage.FromInboundData(data);
 
       throw new NotSupportedException($"Function code {functioncode:X} is not supported.");
     }

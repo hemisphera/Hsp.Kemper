@@ -1,4 +1,8 @@
-﻿namespace Hsp.Kemper.Driver
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
+using Hsp.Kemper.Driver.Converters;
+
+namespace Hsp.Kemper.Driver
 {
 
   public abstract class NrpnSysExMessage : SysExMessage
@@ -15,18 +19,27 @@
       Address = address;
     }
 
-    internal static SysExMessage CreateReadMessage(ParameterProperty prop)
+    internal static NrpnSysExMessage CreateReadMessage(Module mod, PropertyInfo prop)
     {
-      if (prop.Property.PropertyType == typeof(string))
-        return new ReadStringValueMessage(prop.Page, prop.Address);
-      return new ReadValueMessage(prop.Page, prop.Address);
+      var attr = prop.GetCustomAttribute<NrpnParameterAttribute>();
+      var addr = new NrpnAddress(mod.NrpnPageNo, attr.NrpnAddress);
+
+      return
+        attr.IsStringParameter ?
+        (NrpnSysExMessage) new ReadStringValueMessage(addr.Page, addr.Address) :
+        new ReadValueMessage(addr.Page, addr.Address);
     }
 
-    internal static SysExMessage CreateWriteMessage(ParameterProperty prop, object value)
+    internal static SysExMessage CreateWriteMessage(Module mod, PropertyInfo prop, object value)
     {
-      if (prop.Property.PropertyType == typeof(string))
-        return new WriteStringValueMessage(prop.Page, prop.Address, (string) value);
-      return new WriteValueMessage(prop.Page, prop.Address, (int)value);
+      var attr = prop.GetCustomAttribute<NrpnParameterAttribute>();
+      var addr = new NrpnAddress(mod.NrpnPageNo, attr.NrpnAddress);
+
+      var newValue = ConverterCache.Instance.ConvertToMidi(prop, value);
+      return
+        attr.IsStringParameter ?
+        (NrpnSysExMessage) new WriteStringValueMessage(addr.Page, addr.Address, (string) newValue) :
+        new WriteValueMessage(addr.Page, addr.Address, (int) newValue);
     }
 
   }

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Hsp.Kemper.Driver.Converters;
 
 namespace Hsp.Kemper.Driver
 {
@@ -22,7 +23,7 @@ namespace Hsp.Kemper.Driver
       NrpnPageNo = nrpnPageNo;
     }
 
-
+    /*
     public void SetValueFromParameter(ParameterProperty pv, object value)
     {
       var stringParameter = pv.Property.PropertyType == typeof(string);
@@ -39,33 +40,66 @@ namespace Hsp.Kemper.Driver
       var newValue = ValueConverter.ConvertToProperty(targetParameter.Property, value);
       targetParameter.Property.SetValue(this, newValue);
     }
+    */
+
+    public void SetValueFromSysExMessage(NrpnSysExMessage msg)
+    {
+      object value = null;
+      var isStringValue = false;
+      if (msg is WriteValueMessage writeValueMsg)
+      {
+        value = writeValueMsg.Value;
+        isStringValue = true;
+      }
+
+      if (msg is WriteStringValueMessage writeStringValueMsg)
+        value = writeStringValueMsg.Value;
+
+      var property = GetPropertyByAddress(msg, isStringValue);
+      if (property == null)
+        return;
+
+      if (value == null)
+        return;
+        //throw new Exception(""); // todo: implement specific exception
+
+      property.SetValue(this, ConverterCache.Instance.ConvertFromMidi(property, value));
+    }
 
 
-    public ParameterProperty[] GetParameterProperties()
+    public PropertyInfo[] GetParameterProperties(bool stringValue)
     {
       return GetType().GetProperties()
-        .Select(p =>
+        .Where(p =>
         {
           var attr = p.GetCustomAttribute<NrpnParameterAttribute>();
-          if (attr != null)
-          {
-            return new ParameterProperty
-            {
-              Property = p,
-              Value = p.GetValue(this),
-              MinValue = attr.MinValue,
-              MaxValue = attr.MaxValue,
-              Address = attr.NrpnAddress,
-              Page = NrpnPageNo
-            };
-          }
-
-          return null;
+          if (attr?.IsStringParameter != stringValue)
+            return false;
+          return true;
         })
-        .Where(v => v != null)
         .ToArray();
     }
 
+    public PropertyInfo GetPropertyByAddress(NrpnAddress addr, bool isStringValue)
+    {
+      var properties = GetParameterProperties(isStringValue);
+      return properties.FirstOrDefault(p =>
+      {
+        var attr = p.GetCustomAttribute<NrpnParameterAttribute>();
+        if (attr == null) return false;
+        return NrpnPageNo == addr.Page && attr.NrpnAddress == addr.Address;
+      });
+    }
+
+    public PropertyInfo GetPropertyByAddress(byte page, byte address, bool isStringValue)
+    {
+      return GetPropertyByAddress(new NrpnAddress(page, address), isStringValue);
+    }
+
+    public PropertyInfo GetPropertyByAddress(NrpnSysExMessage msg, bool isStringValue)
+    {
+      return GetPropertyByAddress(msg.Page, msg.Address, isStringValue);
+    }
 
   }
 }
